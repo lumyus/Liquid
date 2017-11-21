@@ -56,7 +56,7 @@ public class GDax implements Callback<GDaxData> {
 
     @Override
     public void failed(UnirestException e) {
-        System.out.println("The request has failed");
+        System.out.println("The GDAX request has failed");
     }
 
     @Override

@@ -84,7 +84,7 @@ public class NicehashHandler implements Callback<JsonNode> {
                     }
 
                     public void failed(UnirestException e) {
-                        System.out.println("The request has failed");
+                        System.out.println("The Nicehash request has failed");
                     }
 
                     public void cancelled() {
