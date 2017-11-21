@@ -4,6 +4,8 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
+import com.github.silk8192.jpushbullet.PushbulletClient;
+import com.github.silk8192.jpushbullet.items.push.Push;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -13,11 +15,17 @@ import java.io.IOException;
 
 public class MainHandler implements GDaxInterface, NicehashInterface {
 
+    private static final int MAX_EMERGENCY = 5;
+    private static final int MAX_INFORMATION = 720;
     private final WebClient webClient;
+    private final PushbulletClient pushbulletClient;
     private double maxPriceValue;
     private NicehashHandler nicehashHandler;
+    private int emergencyCounter = 0;
+    private int informationCounter =0;
 
-    public MainHandler(WebClient webClient) {
+    public MainHandler(WebClient webClient, PushbulletClient pushbulletClient) {
+        this.pushbulletClient = pushbulletClient;
         this.webClient = webClient;
     }
 
@@ -71,22 +79,42 @@ public class MainHandler implements GDaxInterface, NicehashInterface {
 
     @Override
     public void registerPrices(double lowestPrice, double myPrice) {
+        handleNotifications(lowestPrice, myPrice);
         adaptOrder(lowestPrice,myPrice);
     }
 
+    private void handleNotifications(double lowestPrice, double myPrice){
+        if(myPrice > maxPriceValue && emergencyCounter < MAX_EMERGENCY){
+            sendNotification("EMERGENCY", "Cédric, something is wrong!");
+            emergencyCounter++;
+        }
+
+        if(informationCounter >= MAX_INFORMATION){
+            sendNotification("Prices", "Lowest Market Price: "+lowestPrice+"\n"+"My Order Price: "+myPrice+"\n"+"Maximum Profitable Price: "+maxPriceValue);
+            informationCounter = 0;
+        }else informationCounter++;
+    }
+
     private void adaptOrder(double lowestPrice, double myPrice) {
+
         System.out.println("Actual price: "+myPrice);
         System.out.println("Max price: "+maxPriceValue);
+
         if(myPrice > lowestPrice || myPrice > maxPriceValue){
             System.out.println("Decrease price");
             nicehashHandler.decrease();
         }else if(lowestPrice>maxPriceValue){
+            System.out.println("Decrease price");
             nicehashHandler.decrease();
         }else{
             System.out.println("Set price to "+lowestPrice);
             nicehashHandler.setPrice(String.valueOf(lowestPrice));
         }
+
     }
 
+    void sendNotification(String title, String body){
+        pushbulletClient.sendNotePush(title,body);
+    }
 
 }

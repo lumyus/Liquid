@@ -3,6 +3,8 @@ package com.trinitytec;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
+import com.github.silk8192.jpushbullet.PushbulletClient;
+import com.github.silk8192.jpushbullet.items.push.Push;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.ObjectMapper;
@@ -35,7 +37,12 @@ public class Main {
     public static void main(String[] args) throws ExecutionException, InterruptedException, UnirestException, IOException {
 
         WebClient webClient = new WebClient();
-        double ETH_ESTIM;
+        PushbulletClient client = new PushbulletClient( "o.y5LdssNXxnwhZV6VF9kW1XBLqn4hadwD" );
+        double lowestPrice = 0.0069;
+        double myPrice = 0.0069;
+        double maxPriceValue = 0.0071;
+
+        //client.sendNotePush("EMERGENCY", "Cédric, something is wrong!");
 
 
         // Only one time
@@ -63,12 +70,12 @@ public class Main {
 
         Unirest.setObjectMapper(objectMapper);
 
-        while(true){
-            MainHandler mainHandler = new MainHandler(webClient);
+     /*   while(true){
+            MainHandler mainHandler = new MainHandler(webClient client);
             mainHandler.calculate();
             Thread.sleep(5000);
         }
-
+*/
 
 
     }
