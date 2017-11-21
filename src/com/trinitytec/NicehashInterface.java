@@ -1,5 +1,5 @@
 package com.trinitytec;
 
 public interface NicehashInterface {
-    void registerPrices(double lowestPrice, double myPrice);
+    void registerPrices(double lowestPrice, PrivateNiceHashOrder niceHashOrder);
 }

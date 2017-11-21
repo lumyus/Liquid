@@ -22,6 +22,7 @@ public class NicehashHandler implements Callback<JsonNode> {
     private double emptyPrice = 0;
     private String myOrderId;
     private String myNewPrice;
+    private PrivateNiceHashOrder myOrder;
 
     public NicehashHandler(MainHandler mainHandler) {
         this.mainHandler = mainHandler;
@@ -78,8 +79,8 @@ public class NicehashHandler implements Callback<JsonNode> {
                             niceHashOrders.add(objectMapper.readValue(resultsArray.getJSONObject(i).toString(), NiceHashOrder.class));
                         }
                         double lowestPrice = orderWithLowestPrice(niceHashOrders);
-                        System.out.println("Lowest payed price: " + lowestPrice);
-                        registerPrices(mainHandler, lowestPrice, myPrice);
+                        System.out.println("Lowest Market Price: " + lowestPrice);
+                        registerPrices(mainHandler, lowestPrice, myOrder);
                     }
 
                     public void failed(UnirestException e) {
@@ -103,6 +104,7 @@ public class NicehashHandler implements Callback<JsonNode> {
         JSONArray resultsArray = results.getJSONArray("orders");
         double price = Double.parseDouble(objectMapper.readValue(resultsArray.getJSONObject(0).toString(), PrivateNiceHashOrder.class).price);
         myOrderId = objectMapper.readValue(resultsArray.getJSONObject(0).toString(), PrivateNiceHashOrder.class).id;
+        myOrder = objectMapper.readValue(resultsArray.getJSONObject(0).toString(), PrivateNiceHashOrder.class);
         //System.out.println(price);
         lowestPrice(price);
     }
@@ -133,8 +135,8 @@ public class NicehashHandler implements Callback<JsonNode> {
         return Double.parseDouble(smallest.price);
     }
 
-    private void registerPrices(NicehashInterface callback, double lowestPrice, double myPrice) {
-        callback.registerPrices(lowestPrice, myPrice);
+    private void registerPrices(NicehashInterface callback, double lowestPrice, PrivateNiceHashOrder niceHashOrder) {
+        callback.registerPrices(lowestPrice, niceHashOrder);
     }
 
     public void decrease() {

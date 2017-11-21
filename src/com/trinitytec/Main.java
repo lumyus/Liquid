@@ -2,42 +2,28 @@ package com.trinitytec;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.*;
 import com.github.silk8192.jpushbullet.PushbulletClient;
-import com.github.silk8192.jpushbullet.items.push.Push;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.async.Callback;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import net.sourceforge.htmlunit.cyberneko.HTMLElements;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.awt.print.Book;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import static java.lang.Math.round;
+import java.util.logging.Level;
 
 
 public class Main {
 
 
     private final static String NANOPOOL_WORKER_ID = "0x8813b025e4d016954bb3c1b366485b2529b30a48";
-    private static ObjectMapper objectMapper;
     static double price;
+    private static ObjectMapper objectMapper;
 
     public static void main(String[] args) throws ExecutionException, InterruptedException, UnirestException, IOException {
 
+        java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(Level.OFF);
         WebClient webClient = new WebClient();
-        PushbulletClient client = new PushbulletClient( "o.y5LdssNXxnwhZV6VF9kW1XBLqn4hadwD" );
+        PushbulletClient client = new PushbulletClient("o.y5LdssNXxnwhZV6VF9kW1XBLqn4hadwD");
         double lowestPrice = 0.0069;
         double myPrice = 0.0069;
         double maxPriceValue = 0.0071;
@@ -70,12 +56,12 @@ public class Main {
 
         Unirest.setObjectMapper(objectMapper);
 
-     /*   while(true){
-            MainHandler mainHandler = new MainHandler(webClient client);
+        MainHandler mainHandler = new MainHandler(webClient, client);
+
+        while (true) {
             mainHandler.calculate();
             Thread.sleep(5000);
         }
-*/
 
 
     }
@@ -102,12 +88,6 @@ public class Main {
                 });
 List<NiceHashOrder>
  */
-
-
-
-
-
-
 
 
 }
