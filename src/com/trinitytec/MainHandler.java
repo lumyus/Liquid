@@ -80,7 +80,9 @@ public class MainHandler implements GDaxInterface, NicehashInterface {
         if(myPrice > lowestPrice || myPrice > maxPriceValue){
             System.out.println("Decrease price");
             nicehashHandler.decrease();
-        }else {
+        }else if(lowestPrice>maxPriceValue){
+            nicehashHandler.decrease();
+        }else{
             System.out.println("Set price to "+lowestPrice);
             nicehashHandler.setPrice(String.valueOf(lowestPrice));
         }
