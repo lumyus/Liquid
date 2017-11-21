@@ -114,7 +114,7 @@ public class MainHandler implements GDaxInterface, NicehashInterface, NanoPoolIn
             System.out.println("Decrease price");
             nicehashHandler.decrease();
         } else if(myPrice == maxPriceValue){
-            nicehashHandler.setPrice(String.valueOf(lowestPrice));
+            nicehashHandler.setPrice(String.valueOf(maxPriceValue));
         }
         else {
             System.out.println("Set price to " + lowestPrice);
