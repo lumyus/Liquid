@@ -76,7 +76,8 @@ public class MainHandler implements GDaxInterface, NicehashInterface {
 
     private void adaptOrder(double lowestPrice, double myPrice) {
         System.out.println("Actual price: "+myPrice);
-        if(myPrice > lowestPrice){
+        System.out.println("Max price: "+maxPriceValue);
+        if(myPrice > lowestPrice || myPrice > maxPriceValue){
             System.out.println("Decrease price");
             nicehashHandler.decrease();
         }else {
