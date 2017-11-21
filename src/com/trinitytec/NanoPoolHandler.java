@@ -21,15 +21,15 @@ public class NanoPoolHandler implements Callback<NanoPoolAccount>{
                 .asObjectAsync(NanoPoolAccount.class, this);
     }
 
-    private void registerNanoPoolAccountBalance(NanoPoolInterface callback, double accountBalance) {
-        callback.OnAccountBalanceReady(accountBalance);
+    private void registerNanoPoolAccountBalance(NanoPoolInterface callback, double accountBalance, String status) {
+        callback.OnAccountBalanceReady(accountBalance, status);
     }
 
     @Override
     public void completed(HttpResponse<NanoPoolAccount> httpResponse) {
         NanoPoolAccount nanoPoolAccountObject = httpResponse.getBody();
         System.out.println(nanoPoolAccountObject.balance);
-        registerNanoPoolAccountBalance(mainHandler, Double.parseDouble(nanoPoolAccountObject.balance));
+        registerNanoPoolAccountBalance(mainHandler, Double.parseDouble(nanoPoolAccountObject.balance), nanoPoolAccountObject.status);
     }
 
     @Override

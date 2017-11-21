@@ -61,7 +61,7 @@ public class Main {
         while (true) {
             mainHandler.calculate();
             mainHandler.checkStats();
-            Thread.sleep(5000);
+            Thread.sleep(15000); //Nicehash orders updated every 30s
         }
 
 

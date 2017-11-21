@@ -22,6 +22,7 @@ public class MainHandler implements GDaxInterface, NicehashInterface, NanoPoolIn
     private boolean emergencyNotificationSent = false;
     private PrivateNiceHashOrder niceHashOrder;
     private double ratio;
+    private int emergencyCounter = 0;
 
     public MainHandler(WebClient webClient, PushbulletClient pushbulletClient) {
         this.pushbulletClient = pushbulletClient;
@@ -67,7 +68,7 @@ public class MainHandler implements GDaxInterface, NicehashInterface, NanoPoolIn
     }
 
     public double maxPrice(double ETH_ESTIM, double ETH_BTC_RATIO) {
-        return round((100 * ETH_BTC_RATIO * ETH_ESTIM) / (100 * 1.06 + 5), 4);
+        return round((100 * ETH_BTC_RATIO * ETH_ESTIM) / (100 * 1.06 + 7), 4);
     }
 
     public void calculate() {
@@ -90,10 +91,11 @@ public class MainHandler implements GDaxInterface, NicehashInterface, NanoPoolIn
         double myOrderPrice = Double.parseDouble(niceHashOrder.price);
 
         if (myOrderPrice > maxPriceValue && (Double.parseDouble(niceHashOrder.workers) > 0)) {
-            if(!emergencyNotificationSent){
+            if(!emergencyNotificationSent && emergencyCounter > 50){
                 sendNotification("EMERGENCY", "Cédric, something is wrong!");
                 emergencyNotificationSent=true;
-            }
+                emergencyCounter = 0;
+            }else emergencyCounter++;
         }
 
         if (informationCounter >= MAX_INFORMATION) {
@@ -131,14 +133,14 @@ public class MainHandler implements GDaxInterface, NicehashInterface, NanoPoolIn
     }
 
     @Override
-    public void OnAccountBalanceReady(double accountBalance) {
+    public void OnAccountBalanceReady(double accountBalance, String status) {
 
         double totalBTC = Double.parseDouble(niceHashOrder.btc_paid)+Double.parseDouble(niceHashOrder.btc_avail);
         double percentageSpent = round(Double.parseDouble(niceHashOrder.btc_paid)/totalBTC*100,1);
-        double percentageOnAccount = round(accountBalance*ratio/totalBTC*100,1);
+        double percentageOnAccount = round(accountBalance*ratio/totalBTC*100,1)-2.5;
 
         if (informationCounter >= MAX_STATE_INFORMATION) {
-             sendNotification("Stats", "Percentage on Nanopool: " +percentageOnAccount+ "%\n" + "Percentage Spent: " + percentageSpent+ "%\n");
+             sendNotification("Stats", "Percentage on Nanopool: " +percentageOnAccount+ "%\n" + "Percentage Spent: " + percentageSpent+ "%\n" + "Active: "+status);
             informationCounter = 0;
         } else informationCounter++;
     }
