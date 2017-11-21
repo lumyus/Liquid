@@ -8,10 +8,11 @@ import com.github.silk8192.jpushbullet.PushbulletClient;
 
 import java.io.IOException;
 
-public class MainHandler implements GDaxInterface, NicehashInterface {
+public class MainHandler implements GDaxInterface, NicehashInterface, NanoPoolInterface {
 
 
     private static final int MAX_INFORMATION = 720;
+    private static final int MAX_STATE_INFORMATION = 360;
     private final WebClient webClient;
     private final PushbulletClient pushbulletClient;
     private double maxPriceValue;
@@ -19,6 +20,8 @@ public class MainHandler implements GDaxInterface, NicehashInterface {
 
     private int informationCounter = 0;
     private boolean emergencyNotificationSent = false;
+    private PrivateNiceHashOrder niceHashOrder;
+    private double ratio;
 
     public MainHandler(WebClient webClient, PushbulletClient pushbulletClient) {
         this.pushbulletClient = pushbulletClient;
@@ -48,6 +51,7 @@ public class MainHandler implements GDaxInterface, NicehashInterface {
 
     @Override
     public void onETHBTCRatioReady(double ratio) {
+        this.ratio = ratio;
         try {
             maxPriceValue = maxPrice(estimateEtherEarned(), ratio);
         } catch (IOException e) {
@@ -70,8 +74,13 @@ public class MainHandler implements GDaxInterface, NicehashInterface {
         new GDax(this).getETHBTCRatio();
     }
 
+    public void checkStats(){
+        new NanoPoolHandler(this).getNanoPoolAccountBalance();
+    }
+
     @Override
     public void registerPrices(double lowestPrice, PrivateNiceHashOrder niceHashOrder) {
+        this.niceHashOrder = niceHashOrder;
         handleNotifications(lowestPrice, niceHashOrder);
         adaptOrder(lowestPrice, Double.parseDouble(niceHashOrder.price));
     }
@@ -121,4 +130,16 @@ public class MainHandler implements GDaxInterface, NicehashInterface {
         pushbulletClient.sendNotePush(title, body);
     }
 
+    @Override
+    public void OnAccountBalanceReady(double accountBalance) {
+
+        double totalBTC = Double.parseDouble(niceHashOrder.btc_paid)+Double.parseDouble(niceHashOrder.btc_avail);
+        double percentageSpent = round(Double.parseDouble(niceHashOrder.btc_paid)/totalBTC*100,1);
+        double percentageOnAccount = round(accountBalance*ratio/totalBTC*100,1);
+
+        if (informationCounter >= MAX_STATE_INFORMATION) {
+             sendNotification("Stats", "Percentage on Nanopool: " +percentageOnAccount+ "%\n" + "Percentage Spent: " + percentageSpent+ "%\n");
+            informationCounter = 0;
+        } else informationCounter++;
+    }
 }

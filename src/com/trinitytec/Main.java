@@ -15,7 +15,7 @@ import java.util.logging.Level;
 public class Main {
 
 
-    private final static String NANOPOOL_WORKER_ID = "0x8813b025e4d016954bb3c1b366485b2529b30a48";
+
     static double price;
     private static ObjectMapper objectMapper;
 
@@ -60,6 +60,7 @@ public class Main {
 
         while (true) {
             mainHandler.calculate();
+            mainHandler.checkStats();
             Thread.sleep(5000);
         }
 
@@ -70,23 +71,8 @@ public class Main {
 
 
 
-            /*Future<HttpResponse<NanoPoolAccount>> future = Unirest.get("https://api.nanopool.org/v1/eth/balance/"+NANOPOOL_WORKER_ID)
-                .asObjectAsync(NanoPoolAccount.class, new Callback<>() {
-                    public void failed(UnirestException e) {
-                        System.out.println("The request has failed");
-                    }
+            /*
 
-                    public void completed(HttpResponse<NanoPoolAccount> response) {
-                        NanoPoolAccount nanoPoolAccountObject = response.getBody();
-                        System.out.println(nanoPoolAccountObject.balance);
-
-                    }
-
-                    public void cancelled() {
-                        System.out.println("The request has been cancelled");
-                    }
-                });
-List<NiceHashOrder>
  */
 
 
