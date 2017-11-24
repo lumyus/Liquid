@@ -8,6 +8,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 import java.io.IOException;
+import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
@@ -15,25 +16,47 @@ import java.util.logging.Level;
 public class Main {
 
 
-
-    static double price;
-    private static ObjectMapper objectMapper;
+    static int MIN_PCT_PROFIT = 5;
+    static double WITHDRAWN_NANOPOOL_BALANCE = 0;
 
     public static void main(String[] args) throws ExecutionException, InterruptedException, UnirestException, IOException {
 
         java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(Level.OFF);
         WebClient webClient = new WebClient();
         PushbulletClient client = new PushbulletClient("o.y5LdssNXxnwhZV6VF9kW1XBLqn4hadwD");
-        double lowestPrice = 0.0069;
-        double myPrice = 0.0069;
-        double maxPriceValue = 0.0071;
 
-        //client.sendNotePush("EMERGENCY", "Cédric, something is wrong!");
+        System.out.println("\n*Welcome to Liquid*\n------------------");
+
+        if(args.length > 0){
+            MIN_PCT_PROFIT = Integer.parseInt(args[0]);
+            WITHDRAWN_NANOPOOL_BALANCE = Double.parseDouble(args[1]);
+        }
+        else {
+            Scanner reader = new Scanner(System.in);  // Reading from System.in
+            System.out.println("What minimum profit would you like: ");
+            MIN_PCT_PROFIT = reader.nextInt(); // Scans the next token of the input as an int.
+//once finished
+            System.out.println("What amount has been withdrawn from NanoPool: ");
+            WITHDRAWN_NANOPOOL_BALANCE = reader.nextDouble(); // Scans the next token of the input as an int.
+            reader.close();
+        }
 
 
-        // Only one time
+        initiateObjectMapper();
 
-        objectMapper = new ObjectMapper() {
+        MainHandler mainHandler = new MainHandler(webClient, client);
+
+        while (true) {
+            mainHandler.calculate();
+            mainHandler.checkStats();
+            Thread.sleep(5000); //Nicehash orders updated every 30s
+        }
+
+
+    }
+
+    private static void initiateObjectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper() {
             private com.fasterxml.jackson.databind.ObjectMapper jacksonObjectMapper
                     = new com.fasterxml.jackson.databind.ObjectMapper();
 
@@ -55,16 +78,6 @@ public class Main {
         };
 
         Unirest.setObjectMapper(objectMapper);
-
-        MainHandler mainHandler = new MainHandler(webClient, client);
-
-        while (true) {
-            mainHandler.calculate();
-            mainHandler.checkStats();
-            Thread.sleep(5000); //Nicehash orders updated every 30s
-        }
-
-
     }
 
 

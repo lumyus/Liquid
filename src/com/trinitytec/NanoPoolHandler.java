@@ -28,7 +28,7 @@ public class NanoPoolHandler implements Callback<NanoPoolAccount>{
     @Override
     public void completed(HttpResponse<NanoPoolAccount> httpResponse) {
         NanoPoolAccount nanoPoolAccountObject = httpResponse.getBody();
-        System.out.println(nanoPoolAccountObject.balance);
+      //  System.out.println(nanoPoolAccountObject.balance);
         registerNanoPoolAccountBalance(mainHandler, Double.parseDouble(nanoPoolAccountObject.balance), nanoPoolAccountObject.status);
     }
 

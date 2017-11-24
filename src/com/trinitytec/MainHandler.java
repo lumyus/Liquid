@@ -12,7 +12,7 @@ public class MainHandler implements GDaxInterface, NicehashInterface, NanoPoolIn
 
 
     private static final int MAX_INFORMATION = 720;
-    private static final int MAX_STATE_INFORMATION = 360;
+    private static final int MAX_STATE_INFORMATION = 720;
     private final WebClient webClient;
     private final PushbulletClient pushbulletClient;
     private double maxPriceValue;
@@ -23,13 +23,14 @@ public class MainHandler implements GDaxInterface, NicehashInterface, NanoPoolIn
     private PrivateNiceHashOrder niceHashOrder;
     private double ratio;
     private int emergencyCounter = 0;
+    private int stateCounter = 0;
 
-    public MainHandler(WebClient webClient, PushbulletClient pushbulletClient) {
+    MainHandler(WebClient webClient, PushbulletClient pushbulletClient) {
         this.pushbulletClient = pushbulletClient;
         this.webClient = webClient;
     }
 
-    public static double round(double value, int places) {
+    private static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
 
         long factor = (long) Math.pow(10, places);
@@ -38,7 +39,7 @@ public class MainHandler implements GDaxInterface, NicehashInterface, NanoPoolIn
         return (double) tmp / factor;
     }
 
-    public double estimateEtherEarned() throws IOException {
+    private double estimateEtherEarned() throws IOException {
         HtmlPage page = webClient.getPage("https://etherscan.io/ether-mining-calculator");
         HtmlInput searchBox = page.getElementByName("ctl00$ContentPlaceHolder1$txtYourHashRate");
         searchBox.setValueAttribute("1000");
@@ -59,23 +60,23 @@ public class MainHandler implements GDaxInterface, NicehashInterface, NanoPoolIn
             e.printStackTrace();
         }
         //System.out.println("MaxPrice: "+ maxPriceValue);
-        getOrderData(maxPriceValue);
+        getOrderData();
     }
 
-    private void getOrderData(double maxPriceValue) {
+    private void getOrderData() {
         nicehashHandler = new NicehashHandler(this);
         nicehashHandler.getPrices();
     }
 
-    public double maxPrice(double ETH_ESTIM, double ETH_BTC_RATIO) {
-        return round((100 * ETH_BTC_RATIO * ETH_ESTIM) / (100 * 1.06 + 7), 4);
+    private double maxPrice(double ETH_ESTIM, double ETH_BTC_RATIO) {
+        return round((100 * ETH_BTC_RATIO * ETH_ESTIM) / (100 * 1.06 + Main.MIN_PCT_PROFIT), 4);
     }
 
-    public void calculate() {
+    void calculate() {
         new GDax(this).getETHBTCRatio();
     }
 
-    public void checkStats(){
+    void checkStats(){
         new NanoPoolHandler(this).getNanoPoolAccountBalance();
     }
 
@@ -128,7 +129,7 @@ public class MainHandler implements GDaxInterface, NicehashInterface, NanoPoolIn
 
     }
 
-    void sendNotification(String title, String body) {
+    private void sendNotification(String title, String body) {
         pushbulletClient.sendNotePush(title, body);
     }
 
@@ -137,11 +138,11 @@ public class MainHandler implements GDaxInterface, NicehashInterface, NanoPoolIn
 
         double totalBTC = Double.parseDouble(niceHashOrder.btc_paid)+Double.parseDouble(niceHashOrder.btc_avail);
         double percentageSpent = round(Double.parseDouble(niceHashOrder.btc_paid)/totalBTC*100,1);
-        double percentageOnAccount = round(accountBalance*ratio/totalBTC*100,1)-2.5;
+        double percentageOnAccount = round((accountBalance+Main.WITHDRAWN_NANOPOOL_BALANCE)*ratio/totalBTC*100,1)-2.5;
 
-        if (informationCounter >= MAX_STATE_INFORMATION) {
+        if (stateCounter >= MAX_STATE_INFORMATION) {
              sendNotification("Stats", "Percentage on Nanopool: " +percentageOnAccount+ "%\n" + "Percentage Spent: " + percentageSpent+ "%\n" + "Active: "+status);
-            informationCounter = 0;
-        } else informationCounter++;
+            stateCounter = 0;
+        } else stateCounter++;
     }
 }
