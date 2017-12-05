@@ -2,7 +2,6 @@
   <library name="org.knowm.xchange:xchange-gdax:4.3.0" type="repository">
     <properties maven-id="org.knowm.xchange:xchange-gdax:4.3.0" />
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/xchange-gdax-4.3.0.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/xchange-core-4.3.0.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/rescu-2.0.1.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jackson-databind-2.9.1.jar!/" />
@@ -18,7 +17,6 @@
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="jar://$PROJECT_DIR$/lib/xchange-gdax-4.3.0-sources.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/xchange-core-4.3.0-sources.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/rescu-2.0.1-sources.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/jackson-databind-2.9.1-sources.jar!/" />
